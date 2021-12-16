@@ -46,15 +46,18 @@ describe('Requestlog:', () => {
       await axios.get('http://localhost:1234/error');
     } catch (e) {
       sinon.assert.calledWith(logspy, {
-        type: ['application'],
         correlationId: undefined,
         request: {
           host: sinon.match(/localhost:[0-9]+/gm),
           path: '/error',
           method: 'GET',
         },
-        response: { status: 'connect ECONNREFUSED 127.0.0.1:1234', duration: sinon.match.number },
+        response: {
+          status: sinon.match.any,
+          duration: sinon.match.number,
+        },
         protocol: 'http:',
+        type: ['application'],
       });
     }
   });
