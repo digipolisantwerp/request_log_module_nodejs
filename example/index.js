@@ -5,12 +5,12 @@ const { requestMiddleware } = require('../lib');
 let server;
 let app;
 
-function initializeExpress(config) {
+function initializeExpress() {
   app = express();
   app.use(express.json());
-  app.get('/externalcall', (req, res) => res.json({ ok: 'ok' }));
-  app.post('/externalcall', (req, res) => res.json({ ok: 'ok' }));
-  app.use(requestMiddleware(config));
+  app.use(requestMiddleware({
+    type: 'json',
+  }));
 
   app.get('/internalcall', (req, res) => res.json({ ok: 'ok' }));
   app.post('/internalcall', (req, res) => res.json({ ok: 'ok' }));
@@ -35,9 +35,9 @@ function startListening() {
   });
 }
 
-async function start(config) {
+async function start() {
   try {
-    initializeExpress(config);
+    initializeExpress();
     const startedapp = await startListening();
     return startedapp;
   } catch (err) {
@@ -55,9 +55,4 @@ module.exports = {
   stop,
 };
 
-start({
-  logResponsePayload: true,
-  logRequestHeaders: ['dgp-correlation'],
-  logRequestPayload: true,
-  logResponseHeaders: ['x-powered-by'],
-});
+start();

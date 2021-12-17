@@ -1,6 +1,13 @@
 {
   "name": "@digipolis/request-log",
   "version": "0.0.2",
+  "keywords": [
+    "digipolis",
+    "antwerpen",
+    "log",
+    "logger",
+    "request-logger"
+  ],
   "description": "Log express Requests in digipolis format",
   "main": "lib/index.js",
   "scripts": {
@@ -15,7 +22,7 @@
     "url": "https://github.com/digipolisantwerp/request_log_module_nodejs.git"
   },
   "author": "Olivier Van den Mooter",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "axios": "^0.24.0",
     "chai": "^4.3.4",
