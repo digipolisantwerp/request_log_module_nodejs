@@ -8,7 +8,7 @@
     "logger",
     "request-logger"
   ],
-  "description": "Log express Requests in digipolis format",
+  "description": "Log express and external Requests in digipolis format",
   "main": "lib/index.js",
   "scripts": {
     "start": "nodemon ./example/index.js",
