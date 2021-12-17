@@ -1,6 +1,6 @@
 
 ![CI](https://github.com/digipolisantwerp/request_log_module_nodejs/actions/workflows/ci.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/digipolisantwerp/request_log_module_nodejs/badge.svg?branch=main)](https://coveralls.io/github/digipolisantwerp/log_module_nodejs?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/digipolisantwerp/request_log_module_nodejs/badge.svg?branch=main)](https://coveralls.io/github/digipolisantwerp/request_log_module_nodejs?branch=main)
 [![npm version](https://badge.fury.io/js/@digipolis%2Frequest-log.svg)](https://badge.fury.io/js/%40digipolis%2Frequest-log)
 
 **npm:** [npmjs.com/package/@digipolis/request-log](https://www.npmjs.com/package/@digipolis/request-log)
