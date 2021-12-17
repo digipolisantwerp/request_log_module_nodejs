@@ -5,7 +5,7 @@
     "digipolis",
     "antwerpen",
     "log",
-    "logger"
+    "logger",
     "request-logger"
   ],
   "description": "Log express Requests in digipolis format",
