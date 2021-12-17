@@ -1,6 +1,6 @@
 {
   "name": "@digipolis/request-log",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Log express Requests in digipolis format",
   "main": "lib/index.js",
   "scripts": {
