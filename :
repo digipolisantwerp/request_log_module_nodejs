@@ -1,4 +1,3 @@
-const https = require('https');
 const sinon = require('sinon');
 const axios = require('axios');
 const chai = require('chai');
@@ -40,16 +39,29 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('no callback return res', async () => {
+  it.only('GET /externalcall {} 200', async () => {
+    const logger = requestlogger();
+    const https = require('https');
+    const logspy = sandbox.spy(logger, 'log');
     const options = {
       hostname: 'google.com',
       port: 443,
-      path: '/',
+      path: '/externalcall',
       method: 'GET',
     };
-    const req = https.request(options);
-    req.end();
-    chai.expect(req.constructor.name).to.eql('ClientRequest');
+    https.get(options);
+
+    // sinon.assert.calledWith(logspy, {
+    //   type: ['application'],
+    //   correlationId: undefined,
+    //   request: {
+    //     host: sinon.match(/localhost:[0-9]+/gm),
+    //     path: '/externalcall',
+    //     method: 'POST',
+    //   },
+    //   response: { status: 200, duration: sinon.match.number },
+    //   protocol: 'http:',
+    // });
   });
   it('GET /externalcall {} error', async () => {
     const logger = requestlogger();
