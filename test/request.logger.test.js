@@ -1,3 +1,4 @@
+const https = require('https');
 const sinon = require('sinon');
 const axios = require('axios');
 const chai = require('chai');
@@ -38,6 +39,17 @@ describe('Requestlog:', () => {
       response: { status: 200, duration: sinon.match.number },
       protocol: 'http:',
     });
+  });
+  it('no callback return res', async () => {
+    const options = {
+      hostname: 'google.com',
+      port: 443,
+      path: '/',
+      method: 'GET',
+    };
+    const req = https.request(options);
+    req.end();
+    chai.expect(req.constructor.name).to.eql('ClientRequest');
   });
   it('GET /externalcall {} error', async () => {
     const logger = requestlogger();
