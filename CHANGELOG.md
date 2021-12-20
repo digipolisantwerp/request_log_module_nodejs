@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]: https://github.com/digipolisantwerp/request_log_module_nodejs/compare/v0.0.1...HEAD
 ## [Unreleased] - yyyy-mm-dd
 
+[0.0.5]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.0.5
+## [0.0.5] - 2021-12-20
+
+- Bugfix: callback is optional & catch host as alternative of hostname
+
+[0.0.4]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.0.4
+## [0.0.4] - 2021-12-17
+
+- Updated documentation for release
+
 [0.0.3]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.0.3
 ## [0.0.3] - 2021-12-17
 
