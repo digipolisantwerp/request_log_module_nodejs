@@ -1,4 +1,5 @@
 const https = require('https');
+const http = require('http');
 const sinon = require('sinon');
 const axios = require('axios');
 const chai = require('chai');
@@ -61,6 +62,109 @@ describe('Requestlog:', () => {
     const req = https.request(new URL('https://google.be'), options);
     req.end();
     chai.expect(req.constructor.name).to.eql('ClientRequest');
+  });
+  it('url of type URL', async () => {
+    delete require.cache[require.resolve('http')];
+
+    const logger = requestlogger();
+    const logspy = sandbox.spy(logger, 'log');
+    async function get(url) {
+      return new Promise((resolve, reject) => {
+        http.get(url, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            console.log('Response ended: ');
+            resolve('ok');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+          reject(err);
+        });
+      });
+    }
+    await get(new URL(`http://localhost:${server.address().port}/externalcall`));
+    sinon.assert.calledWith(logspy, {
+      correlationId: undefined,
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/externalcall',
+      },
+      response: { status: 200, duration: sinon.match.number },
+      protocol: 'http:',
+      type: ['application'],
+    });
+  });
+  it('url of type string', async () => {
+    delete require.cache[require.resolve('http')];
+
+    const logger = requestlogger();
+    const logspy = sandbox.spy(logger, 'log');
+    async function get(url, options) {
+      return new Promise((resolve, reject) => {
+        http.get(url, options, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            console.log('Response ended: ');
+            resolve('ok');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+          reject(err);
+        });
+      });
+    }
+    await get(`http://localhost:${server.address().port}/externalcall`, {}, () => {});
+    sinon.assert.calledWith(logspy, {
+      correlationId: undefined,
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/externalcall',
+      },
+      response: { status: 200, duration: sinon.match.number },
+      protocol: 'http:',
+      type: ['application'],
+    });
+  });
+  it('url of type string error', async () => {
+    delete require.cache[require.resolve('http')];
+
+    const logger = requestlogger();
+    const logspy = sandbox.spy(logger, 'log');
+    async function get(url, options) {
+      return new Promise((resolve, reject) => {
+        http.get(url, options, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            console.log('Response ended: ');
+            resolve('ok');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+          reject(err);
+        });
+      });
+    }
+    try {
+      await get(`http://localhosttt:${server.address().port}/externalcall`, {}, () => {});
+    } catch (e) {
+      chai.expect(e.code).to.eql('ENOTFOUND');
+    }
+    sinon.assert.calledWith(logspy, {
+      correlationId: undefined,
+      request: {
+        host: sinon.match(/localhosttt:[0-9]+/gm),
+        path: '/externalcall',
+      },
+      response: {
+        status: sinon.match.any,
+        duration: sinon.match.number,
+      },
+      protocol: 'http:',
+      type: ['application'],
+    });
   });
   it('GET /externalcall {} error', async () => {
     const logger = requestlogger();
