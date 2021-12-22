@@ -52,21 +52,33 @@ describe('Requestlog:', () => {
     req.end();
     chai.expect(req.constructor.name).to.eql('ClientRequest');
   });
-  it('url of type URL', async () => {
-    const options = {
-      port: 443,
-      path: '/',
-      method: 'GET',
-    };
-    const req = https.request(new URL('https://google.be'), options);
-    req.end();
-    chai.expect(req.constructor.name).to.eql('ClientRequest');
-  });
   it('GET /externalcall {} error', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
       await axios.get('http://localhost:1234/error');
+    } catch (e) {
+      sinon.assert.calledWith(logspy, {
+        correlationId: undefined,
+        request: {
+          host: sinon.match(/localhost:[0-9]+/gm),
+          path: '/error',
+          method: 'GET',
+        },
+        response: {
+          status: sinon.match.any,
+          duration: sinon.match.number,
+        },
+        protocol: 'http:',
+        type: ['application'],
+      });
+    }
+  });
+  it('GET /externalcall {} error', async () => {
+    const logger = requestlogger();
+    const logspy = sandbox.spy(logger, 'log');
+    try {
+      await axios.get(new URL('http://localhost:1234/error'));
     } catch (e) {
       sinon.assert.calledWith(logspy, {
         correlationId: undefined,
