@@ -154,7 +154,7 @@ describe('middleware:', () => {
         headers: {
           accept: 'application/json, text/plain, */*',
           'dgp-correlation': 'dgpheadervalue',
-          'user-agent': 'axios/0.24.0',
+          'user-agent': 'axios/0.25.0',
           host,
           connection: 'close',
         },
