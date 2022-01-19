@@ -154,7 +154,7 @@ describe('middleware:', () => {
         headers: {
           accept: 'application/json, text/plain, */*',
           'dgp-correlation': 'dgpheadervalue',
-          'user-agent': 'axios/0.24.0',
+          'user-agent': 'axios/0.25.0',
           host,
           connection: 'close',
         },
@@ -250,6 +250,132 @@ describe('middleware:', () => {
         correlationId: 'dgpheadervalue',
         request: {
           headers: { 'dgp-correlation': 'dgpheadervalue' },
+          host,
+          path: '/internalcall',
+          method: 'GET',
+          payload: {},
+        },
+        response: {
+          headers: { 'x-powered-by': 'Express' },
+          status: 200,
+          duration: 0,
+          payload: '{"ok":"ok"}',
+        },
+        protocol: 'http',
+        type: ['application'],
+      },
+    );
+    clock.restore();
+  });
+  it('GET /internalcall { logRequestHeaders & correlationIdLocation } 200', async () => {
+    clock = sinon.useFakeTimers(Date.now());
+    server = await app.start({
+      type: 'text',
+      logResponsePayload: true,
+      logRequestPayload: true,
+      logResponseHeaders: ['x-powered-by'],
+      correlationIdLocation: 'id',
+    });
+    const host = `localhost:${server.address().port}`;
+    await axios.get(
+      `http://${host}/internalcall`,
+      {
+        headers: {
+          'Dgp-Correlation': 'dgpheadervalue',
+        },
+      },
+    );
+    sinon.assert.calledWith(
+      logspy,
+      'INFO:',
+      new Date().toISOString(),
+      {
+        correlationId: 'reqid',
+        request: {
+          host,
+          path: '/internalcall',
+          method: 'GET',
+          payload: {},
+        },
+        response: {
+          headers: { 'x-powered-by': 'Express' },
+          status: 200,
+          duration: 0,
+          payload: '{"ok":"ok"}',
+        },
+        protocol: 'http',
+        type: ['application'],
+      },
+    );
+    clock.restore();
+  });
+  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
+    clock = sinon.useFakeTimers(Date.now());
+    server = await app.start({
+      type: 'text',
+      logResponsePayload: true,
+      logRequestPayload: true,
+      logResponseHeaders: ['x-powered-by'],
+      correlationIdLocation: 'info.id',
+    });
+    const host = `localhost:${server.address().port}`;
+    await axios.get(
+      `http://${host}/internalcall`,
+      {
+        headers: {
+          'Dgp-Correlation': 'dgpheadervalue',
+        },
+      },
+    );
+    sinon.assert.calledWith(
+      logspy,
+      'INFO:',
+      new Date().toISOString(),
+      {
+        correlationId: 'reqinfoid',
+        request: {
+          host,
+          path: '/internalcall',
+          method: 'GET',
+          payload: {},
+        },
+        response: {
+          headers: { 'x-powered-by': 'Express' },
+          status: 200,
+          duration: 0,
+          payload: '{"ok":"ok"}',
+        },
+        protocol: 'http',
+        type: ['application'],
+      },
+    );
+    clock.restore();
+  });
+  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
+    clock = sinon.useFakeTimers(Date.now());
+    server = await app.start({
+      type: 'text',
+      logResponsePayload: true,
+      logRequestPayload: true,
+      logResponseHeaders: ['x-powered-by'],
+      correlationIdLocation: 'this.path.is.wrong.id',
+    });
+    const host = `localhost:${server.address().port}`;
+    await axios.get(
+      `http://${host}/internalcall`,
+      {
+        headers: {
+          'Dgp-Correlation': 'dgpheadervalue',
+        },
+      },
+    );
+    sinon.assert.calledWith(
+      logspy,
+      'INFO:',
+      new Date().toISOString(),
+      {
+        correlationId: undefined,
+        request: {
           host,
           path: '/internalcall',
           method: 'GET',

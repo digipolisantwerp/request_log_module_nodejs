@@ -7,6 +7,11 @@ let app;
 function initializeExpress(config) {
   app = express();
   app.use(express.json());
+  app.use((req, res, next) => {
+    req.id = 'reqid';
+    req.info = { id: 'reqinfoid' };
+    return next();
+  });
   app.get('/externalcall', (req, res) => res.json({ ok: 'ok' }));
   app.post('/externalcall', (req, res) => res.json({ ok: 'ok' }));
   app.use(requestMiddleware(config));
