@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]: https://github.com/digipolisantwerp/request_log_module_nodejs/compare/v0.0.1...HEAD
 ## [Unreleased] - yyyy-mm-dd
 
+[0.1.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.1.0
+## [0.1.0] - 2022-01-19
+
+- Add option to log req.id from req instead of header
+- bump axios for venerability
+
 [0.0.8]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.0.8
 ## [0.0.8] - 2021-12-22
 
