@@ -42,13 +42,14 @@ $ yarn add @digipolis/request-log
 ## Configuration
 
 ##### Params:
-| Param                                      | Description          | Values                                                                                                  |
-| :---                                       | :---                 | :---                                                                                                    |
-| ***type*** *(optional)*                    | Set logging mode     | **log** (default) / **json** / **text**                                                                 |
-| ***logResponsePayload*** *(optional)*      | log response payload | **true** / **false** (default)                                                                          |
-| ***logResponseHeaders*** *(optional)*      | log response headers | **true** (all headers) / `["headername1", "headername2"]` (log headers in array) / **false** (default)  |
-| ***logRequestPayload*** *(optional)*       | log request headers  | **true** (default) / **false** (return)                                                                 |
-| ***logRequestHeaders*** *(optional)*       | log request payload  | **true** (all headers) / `["headername1", "headername2"]`  (log headers in array) / **false** (default) |
+| Param                                      | Description                       | Values                                                                                                  |
+| :---                                       | :---                              | :---                                                                                                    |
+| ***type*** *(optional)*                    | Set logging mode                  | **log** (default) / **json** / **text**                                                                 |
+| ***correlationIdLocation*** *(optional)*   | Set correlation Location for BFF  | undefined (default will search the req.headers) / **id** (point to req.id)                              |
+| ***logResponsePayload*** *(optional)*      | log response payload              | **true** / **false** (default)                                                                          |
+| ***logResponseHeaders*** *(optional)*      | log response headers              | **true** (all headers) / `["headername1", "headername2"]` (log headers in array) / **false** (default)  |
+| ***logRequestPayload*** *(optional)*       | log request headers               | **true** (default) / **false** (return)                                                                 |
+| ***logRequestHeaders*** *(optional)*       | log request payload               | **true** (all headers) / `["headername1", "headername2"]`  (log headers in array) / **false** (default) |
 
 ### Example:
 
@@ -92,6 +93,50 @@ $ curl -X "POST" "http://localhost:2000/internalcall" \
   level: 'INFO',
   correlationId: 'correlationid',
   request: { host: 'localhost:2000', path: '/internalcall', method: 'POST' },
+  response: { status: 200, duration: 2 },
+  protocol: 'http'
+}
+```
+#### Example log specific headers & body BFF:
+```javascript
+const { requestlogger, requestMiddleware } = require('@digipolis/request-log');
+
+const config = {
+  type: 'json',
+  correlationIdLocation: 'id', // deeper nested property 'meta.id'
+};
+
+// log external requests
+requestlogger(config);
+
+function initializeExpress() {
+   const app = express();
+   // For BFF type applications the browser will not set the DGP header so we set it ourselves
+   app.use((req, res, next) => {
+      req.id = uuidv4(); // b207d502-de0f-4467-9a1e-2dd032fbe84d
+      return next();
+   });
+   // log incoming requests
+   app.use(requestMiddleware(config);
+   app.post('/internalcall', (req, res) => res.json({ ok: 'ok' }));
+}
+
+```
+##### Request
+
+```sh
+$ curl -X "GET" "http://localhost:2000/home" \
+```
+##### output
+
+```javascript
+// output
+{
+  timestamp: '2021-12-17T10:28:26.505Z',
+  type: [ 'application' ],
+  level: 'INFO',
+  correlationId: 'b207d502-de0f-4467-9a1e-2dd032fbe84d',
+  request: { host: 'localhost:2000', path: '/home', method: 'GET' },
   response: { status: 200, duration: 2 },
   protocol: 'http'
 }
