@@ -45,6 +45,13 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
+  it('GET /internalcall {} 200 silent', async () => {
+    server = await app.start({
+      type: 'silent',
+    });
+    await axios.get(`http://localhost:${server.address().port}/internalcall`);
+    sinon.assert.calledOnceWithExactly(logspy, sinon.match(/Express server listening on port/));
+  });
   it('GET /internalcall { logResponsePayload: true } 200', async () => {
     server = await app.start({ type: 'json', logResponsePayload: true });
     await axios.get(`http://localhost:${server.address().port}/internalcall`);
