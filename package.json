@@ -14,8 +14,7 @@
     "start": "nodemon ./example/index.js",
     "test": "mocha ./test && npm run lint",
     "lint": "eslint \"**/*.js\"",
-    "coverage": "nyc --reporter=html --reporter=text --reporter=lcovonly npm test && eslint .",
-    "coverage:watch": "nodemon --exec 'npm run coverage || true'"
+    "coverage": "c8 --reporter=lcovonly  --reporter=html --reporter=text npm test && eslint ."
   },
   "repository": {
     "type": "git",
@@ -29,11 +28,10 @@
     "chai-json-schema": "^1.5.1",
     "eslint": "^8.3.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.26.0",
     "express": "^4.17.1",
     "mocha": "^9.2.0",
-    "nodemon": "^2.0.15",
-    "nyc": "^15.1.0",
+    "c8": "^7.11.0",
     "sinon": "^12.0.1"
   },
   "dependencies": {
