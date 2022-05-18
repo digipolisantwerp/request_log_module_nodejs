@@ -326,6 +326,50 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
+  it('POST /externalcall dgp-correlation { _no_correlation_ fallback }', async () => {
+    const logger = requestlogger({
+      logResponsePayload: true,
+      logRequestHeaders: true,
+      logRequestPayload: true,
+      logResponseHeaders: true,
+      correlationIdfallback: '_no_correlation_',
+    });
+    const logspy = sandbox.spy(logger, 'log');
+    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' }, {
+      headers: {
+      },
+    });
+    sinon.assert.calledWith(logspy, {
+      type: ['application'],
+      correlationId: '_no_correlation_',
+      request: {
+        headers: {
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/json',
+          'User-Agent': 'axios/0.25.0',
+          'Content-Length': 20,
+        },
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/externalcall',
+        payload: '{"param":"paramval"}',
+        method: 'POST',
+      },
+      response: {
+        headers: {
+          'x-powered-by': 'Express',
+          'content-type': 'application/json; charset=utf-8',
+          'content-length': '11',
+          etag: sinon.match.any,
+          date: sinon.match.any,
+          connection: 'close',
+        },
+        payload: '{"ok":"ok"}',
+        status: 200,
+        duration: sinon.match.number,
+      },
+      protocol: 'http:',
+    });
+  });
   it('POST /externalcall dgp-correlation { alloptions }', async () => {
     const logger = requestlogger({
       logResponsePayload: true,
