@@ -316,6 +316,90 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
+  it('GET /internalcall { logRequestHeaders & correlationIdfallback 200', async () => {
+    clock = sinon.useFakeTimers(Date.now());
+    server = await app.start({
+      type: 'text',
+      logResponsePayload: true,
+      logRequestPayload: true,
+      logResponseHeaders: ['x-powered-by'],
+      correlationIdfallback: '_no_correlation_',
+    });
+    const host = `localhost:${server.address().port}`;
+    await axios.get(
+      `http://${host}/internalcall`,
+      {
+        headers: {
+        },
+      },
+    );
+    sinon.assert.calledWith(
+      logspy,
+      'INFO:',
+      new Date().toISOString(),
+      {
+        correlationId: '_no_correlation_',
+        request: {
+          host,
+          path: '/internalcall',
+          method: 'GET',
+          payload: {},
+        },
+        response: {
+          headers: { 'x-powered-by': 'Express' },
+          status: 200,
+          duration: 0,
+          payload: '{"ok":"ok"}',
+        },
+        protocol: 'http',
+        type: ['application'],
+      },
+    );
+    clock.restore();
+  });
+  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) & fallback } 200', async () => {
+    clock = sinon.useFakeTimers(Date.now());
+    server = await app.start({
+      type: 'text',
+      logResponsePayload: true,
+      logRequestPayload: true,
+      logResponseHeaders: ['x-powered-by'],
+      correlationIdLocation: 'info.empty',
+      correlationIdfallback: '_no_correlation_',
+    });
+    const host = `localhost:${server.address().port}`;
+    await axios.get(
+      `http://${host}/internalcall`,
+      {
+        headers: {
+          'Dgp-Correlation': 'dgpheadervalue',
+        },
+      },
+    );
+    sinon.assert.calledWith(
+      logspy,
+      'INFO:',
+      new Date().toISOString(),
+      {
+        correlationId: '_no_correlation_',
+        request: {
+          host,
+          path: '/internalcall',
+          method: 'GET',
+          payload: {},
+        },
+        response: {
+          headers: { 'x-powered-by': 'Express' },
+          status: 200,
+          duration: 0,
+          payload: '{"ok":"ok"}',
+        },
+        protocol: 'http',
+        type: ['application'],
+      },
+    );
+    clock.restore();
+  });
   it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
     clock = sinon.useFakeTimers(Date.now());
     server = await app.start({

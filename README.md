@@ -44,8 +44,9 @@ $ yarn add @digipolis/request-log
 ##### Params:
 | Param                                      | Description                       | Values                                                                                                  |
 | :---                                       | :---                              | :---                                                                                                    |
-| ***type*** *(optional)*                    | Set logging mode                  | **log** (default) / **json** / **text** /**silent**/                                                  |
+| ***type*** *(optional)*                    | Set logging mode                  | **log** (default) / **json** / **text** /**silent**/                                                    |
 | ***correlationIdLocation*** *(optional)*   | Set correlation Location for BFF  | undefined (default will search the req.headers) / **id** (point to req.id)                              |
+| ***correlationIdfallback*** *(optional)*   | Set correlationId fallback        | undefined (default will not fallback) / **string** (will replace correlationId in output if missing)    |
 | ***logResponsePayload*** *(optional)*      | log response payload              | **true** / **false** (default)                                                                          |
 | ***logResponseHeaders*** *(optional)*      | log response headers              | **true** (all headers) / `["headername1", "headername2"]` (log headers in array) / **false** (default)  |
 | ***logRequestPayload*** *(optional)*       | log request headers               | **true** (default) / **false** (return)                                                                 |
