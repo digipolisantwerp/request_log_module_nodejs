@@ -68,7 +68,7 @@ requestlogger(config);
 function initializeExpress() {
    const app = express();
    // log incoming requests
-   app.use(requestMiddleware(config);
+   app.use(requestMiddleware(config));
    app.post('/internalcall', (req, res) => res.json({ ok: 'ok' }));
 }
 
