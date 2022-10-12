@@ -31,8 +31,6 @@ describe('Requestlog:', () => {
     const logspy = sandbox.spy(logger, 'log');
     await axios.get(`http://localhost:${server.address().port}/externalcall`);
     sinon.assert.calledWith(logspy, {
-      type: ['application'],
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -40,6 +38,7 @@ describe('Requestlog:', () => {
       },
       response: { status: 200, duration: sinon.match.number },
       protocol: 'http:',
+      type: ['application'],
     });
   });
   it('no callback return res', async () => {
@@ -85,7 +84,6 @@ describe('Requestlog:', () => {
     }
     await get(new URL(`http://localhost:${server.address().port}/externalcall`));
     sinon.assert.calledWith(logspy, {
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -117,7 +115,6 @@ describe('Requestlog:', () => {
     }
     await get(`http://localhost:${server.address().port}/externalcall`, {}, () => {});
     sinon.assert.calledWith(logspy, {
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -153,7 +150,6 @@ describe('Requestlog:', () => {
       console.log('e', e);
     }
     sinon.assert.calledWith(logspy, {
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhosttt:[0-9]+/gm),
         path: '/externalcall',
@@ -173,7 +169,6 @@ describe('Requestlog:', () => {
       await axios.get('http://localhost:1234/error');
     } catch (e) {
       sinon.assert.calledWith(logspy, {
-        correlationId: undefined,
         request: {
           host: sinon.match(/localhost:[0-9]+/gm),
           path: '/error',
@@ -196,7 +191,6 @@ describe('Requestlog:', () => {
     } catch (e) {
       sinon.assert.calledWith(logspy, {
         type: ['application'],
-        correlationId: undefined,
         request: {
           host: 'www.google.com',
           path: '/notfound',
@@ -215,7 +209,6 @@ describe('Requestlog:', () => {
     } catch (e) {
       sinon.assert.calledWith(logspy, {
         type: ['application'],
-        correlationId: undefined,
         request: {
           host: 'superfakedomain.fakextention',
           path: '/externalcall',
@@ -232,7 +225,6 @@ describe('Requestlog:', () => {
     await axios.get(`http://localhost:${server.address().port}/externalcall`);
     sinon.assert.calledWith(logspy, {
       type: ['application'],
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -252,7 +244,6 @@ describe('Requestlog:', () => {
     await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -268,7 +259,6 @@ describe('Requestlog:', () => {
     await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -289,7 +279,6 @@ describe('Requestlog:', () => {
     });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
-      correlationId: undefined,
       request: {
         headers: {
           Accept: 'application/json, text/plain, */*',

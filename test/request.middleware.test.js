@@ -33,9 +33,9 @@ describe('middleware:', () => {
     await axios.get(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
+      correlationId: sinon.match.any,
       type: ['application'],
       level: 'INFO',
-      correlationId: undefined,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/internalcall',
@@ -59,7 +59,7 @@ describe('middleware:', () => {
       timestamp: sinon.match.any,
       type: ['application'],
       level: 'INFO',
-      correlationId: undefined,
+      correlationId: sinon.match.any,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/internalcall',
@@ -80,7 +80,7 @@ describe('middleware:', () => {
       timestamp: sinon.match.any,
       type: ['application'],
       level: 'INFO',
-      correlationId: undefined,
+      correlationId: sinon.match.any,
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/write',
@@ -107,7 +107,7 @@ describe('middleware:', () => {
       timestamp: sinon.match.any,
       type: ['application'],
       level: 'INFO',
-      correlationId: undefined,
+      correlationId: sinon.match.any,
       request: {
         headers: {
           accept: 'application/json, text/plain, */*',
@@ -465,7 +465,6 @@ describe('middleware:', () => {
       'INFO:',
       new Date().toISOString(),
       {
-        correlationId: undefined,
         request: {
           host,
           path: '/internalcall',
