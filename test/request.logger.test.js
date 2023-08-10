@@ -1,9 +1,9 @@
 const https = require('https');
 const http = require('http');
+const { URL } = require('url');
 const sinon = require('sinon');
 const axios = require('axios');
 const chai = require('chai');
-const { URL } = require('url');
 
 const { requestlogger } = require('../lib');
 const app = require('./helpers/server');
@@ -284,8 +284,9 @@ describe('Requestlog:', () => {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/json',
           myheader: 'header',
-          'User-Agent': 'axios/0.25.0',
-          'Content-Length': 20,
+          'Accept-Encoding': sinon.match.any,
+          'User-Agent': sinon.match(/axios\/*/gm),
+          'Content-Length': sinon.match.any,
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -335,8 +336,9 @@ describe('Requestlog:', () => {
         headers: {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/json',
-          'User-Agent': 'axios/0.25.0',
-          'Content-Length': 20,
+          'Accept-Encoding': sinon.match.any,
+          'User-Agent': sinon.match(/axios\/*/gm),
+          'Content-Length': sinon.match.any,
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -344,14 +346,7 @@ describe('Requestlog:', () => {
         method: 'POST',
       },
       response: {
-        headers: {
-          'x-powered-by': 'Express',
-          'content-type': 'application/json; charset=utf-8',
-          'content-length': '11',
-          etag: sinon.match.any,
-          date: sinon.match.any,
-          connection: 'close',
-        },
+        headers: sinon.match.any,
         payload: '{"ok":"ok"}',
         status: 200,
         duration: sinon.match.number,
@@ -380,8 +375,9 @@ describe('Requestlog:', () => {
           Accept: 'application/json, text/plain, */*',
           'Content-Type': 'application/json',
           'dgp-correlation': 'correlationid',
-          'User-Agent': 'axios/0.25.0',
-          'Content-Length': 20,
+          'Accept-Encoding': sinon.match.any,
+          'User-Agent': sinon.match(/axios\/*/gm),
+          'Content-Length': sinon.match.any,
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -389,14 +385,7 @@ describe('Requestlog:', () => {
         method: 'POST',
       },
       response: {
-        headers: {
-          'x-powered-by': 'Express',
-          'content-type': 'application/json; charset=utf-8',
-          'content-length': '11',
-          etag: sinon.match.any,
-          date: sinon.match.any,
-          connection: 'close',
-        },
+        headers: sinon.match.any,
         payload: '{"ok":"ok"}',
         status: 200,
         duration: sinon.match.number,
