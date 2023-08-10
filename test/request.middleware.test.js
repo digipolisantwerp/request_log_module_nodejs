@@ -111,9 +111,10 @@ describe('middleware:', () => {
       request: {
         headers: {
           accept: 'application/json, text/plain, */*',
-          'user-agent': sinon.match.any,
+          'user-agent': sinon.match(/axios\/*/gm),
+          'accept-encoding': sinon.match.any,
           host: sinon.match(/localhost:[0-9]+/gm),
-          connection: 'close',
+          connection: sinon.match.any,
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/internalcall',
@@ -161,9 +162,10 @@ describe('middleware:', () => {
         headers: {
           accept: 'application/json, text/plain, */*',
           'dgp-correlation': 'dgpheadervalue',
-          'user-agent': 'axios/0.25.0',
+          'user-agent': sinon.match(/axios\/*/gm),
+          'accept-encoding': sinon.match.any,
           host,
-          connection: 'close',
+          connection: sinon.match.any,
         },
         host,
         path: '/internalcall',
