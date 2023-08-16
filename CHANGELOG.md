@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]: https://github.com/digipolisantwerp/request_log_module_nodejs/compare/v0.0.1...HEAD
 ## [Unreleased] - yyyy-mm-dd
 
+[0.5.3]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.5.3
+## [0.5.3] - 2023-08-16
+
+- bump log module
+
 [0.5.2]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.5.2
 ## [0.5.2] - 2023-08-10
 
