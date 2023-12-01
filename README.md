@@ -51,6 +51,7 @@ $ yarn add @digipolis/request-log
 | ***logResponseHeaders*** *(optional)*      | log response headers              | **true** (all headers) / `["headername1", "headername2"]` (log headers in array) / **false** (default)  |
 | ***logRequestPayload*** *(optional)*       | log request headers               | **true** (default) / **false** (return)                                                                 |
 | ***logRequestHeaders*** *(optional)*       | log request payload               | **true** (all headers) / `["headername1", "headername2"]`  (log headers in array) / **false** (default) |
+| ***logRequestSearchParams*** *(optional)*  | log request query parameters      | **true** / **false** (default)                                                                          |
 
 ### Example:
 

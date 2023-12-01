@@ -35,6 +35,6 @@
     "sinon": "^16.1.3"
   },
   "dependencies": {
-    "@digipolis/log": "^1.0.2"
+    "@digipolis/log": "^1.1.0"
   }
 }

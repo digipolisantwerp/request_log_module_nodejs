@@ -124,6 +124,73 @@ describe('Requestlog:', () => {
       type: ['application'],
     });
   });
+  it('url of type string with query should not log query by default', async () => {
+    delete require.cache[require.resolve('http')];
+
+    const logger = requestlogger();
+    const logspy = sandbox.spy(logger, 'log');
+    async function get(url, options) {
+      return new Promise((resolve, reject) => {
+        http.get(url, options, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            console.log('Response ended: ');
+            resolve('ok');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+          reject(err);
+        });
+      });
+    }
+    await get(`http://localhost:${server.address().port}/externalcall?page=1`, {}, () => {});
+    sinon.assert.calledWith(logspy, {
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/externalcall',
+      },
+      response: { status: 200, duration: sinon.match.number },
+      protocol: 'http:',
+      type: ['application'],
+    });
+  });
+  it('GET /externalcall?page=1 {} should not log query 200', async () => {
+    const logger = requestlogger();
+    const logspy = sandbox.spy(logger, 'log');
+    await axios.get(`http://localhost:${server.address().port}/externalcall?page=1`);
+    sinon.assert.calledWith(logspy, {
+      type: ['application'],
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/externalcall',
+        method: 'GET',
+      },
+      response: {
+        status: 200,
+        duration: sinon.match.any,
+      },
+      protocol: 'http:',
+    });
+  });
+  it('GET /externalcall { logRequestSearchParams: true } should log query 200', async () => {
+    const logger = requestlogger({ logRequestSearchParams: true });
+    const logspy = sandbox.spy(logger, 'log');
+    await axios.get(`http://localhost:${server.address().port}/externalcall?page=1`);
+    sinon.assert.calledWith(logspy, {
+      type: ['application'],
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/externalcall?page=1',
+        method: 'GET',
+      },
+      response: {
+        status: 200,
+        duration: sinon.match.any,
+      },
+      protocol: 'http:',
+    });
+  });
   it('url of type string error', async () => {
     delete require.cache[require.resolve('http')];
 
