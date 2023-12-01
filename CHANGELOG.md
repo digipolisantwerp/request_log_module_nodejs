@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]: https://github.com/digipolisantwerp/request_log_module_nodejs/compare/v0.0.1...HEAD
 ## [Unreleased] - yyyy-mm-dd
 
+[0.6.4]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.6.0
+## [0.6.0] - 2023-12-01
+
+- Remove query params from log by default but keep option
+
 [0.5.4]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.5.4
 ## [0.5.4] - 2023-10-20
+
 - node 21 testing
 
 [0.5.3]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.5.3
