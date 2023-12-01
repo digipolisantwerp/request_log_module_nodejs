@@ -1,17 +1,25 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const express = require('express');
-const { requestMiddleware } = require('../lib');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const axios = require('axios');
+
+const { requestMiddleware, requestlogger } = require('../lib');
 
 let server;
 let app;
+
+requestlogger({
+  type: 'json',
+  logRequestSearchParams: true,
+});
 
 function initializeExpress() {
   app = express();
   app.use(express.json());
   app.use(requestMiddleware({
     type: 'json',
+    logRequestSearchParams: true,
   }));
-
   app.get('/internalcall', (req, res) => res.json({ ok: 'ok' }));
   app.post('/internalcall', (req, res) => res.json({ ok: 'ok' }));
   app.get('/write', (req, res) => {
@@ -39,6 +47,7 @@ async function start() {
   try {
     initializeExpress();
     const startedapp = await startListening();
+    await axios.get('http://localhost:2000?page=1').catch(() => {});
     return startedapp;
   } catch (err) {
     console.log(`Error occured ${err}`);

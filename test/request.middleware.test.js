@@ -73,6 +73,46 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
+  it('GET /internalcall?query=true { logRequestSearchParams: true } 200', async () => {
+    server = await app.start({ type: 'json', logRequestSearchParams: true });
+    await axios.get(`http://localhost:${server.address().port}/internalcall?query=true`);
+    sinon.assert.calledWith(logspy, {
+      timestamp: sinon.match.any,
+      type: ['application'],
+      level: 'INFO',
+      correlationId: sinon.match.any,
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/internalcall?query=true',
+        method: 'GET',
+      },
+      response: {
+        status: 200,
+        duration: sinon.match.number,
+      },
+      protocol: 'http',
+    });
+  });
+  it('GET /internalcall?query=true { logRequestSearchParams: false } (default) 200', async () => {
+    server = await app.start({ type: 'json', logRequestSearchParams: false });
+    await axios.get(`http://localhost:${server.address().port}/internalcall?query=true`);
+    sinon.assert.calledWith(logspy, {
+      timestamp: sinon.match.any,
+      type: ['application'],
+      level: 'INFO',
+      correlationId: sinon.match.any,
+      request: {
+        host: sinon.match(/localhost:[0-9]+/gm),
+        path: '/internalcall',
+        method: 'GET',
+      },
+      response: {
+        status: 200,
+        duration: sinon.match.number,
+      },
+      protocol: 'http',
+    });
+  });
   it('GET /write { logResponsePayload: true } 200', async () => {
     server = await app.start({ type: 'json', logResponsePayload: true });
     await axios.get(`http://localhost:${server.address().port}/write`);
