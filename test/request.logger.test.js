@@ -62,7 +62,7 @@ describe('Requestlog:', () => {
     req.end();
     chai.expect(req.constructor.name).to.eql('ClientRequest');
   });
-  it('url of type URL', async () => {
+  it('url of type URL localhost', async () => {
     delete require.cache[require.resolve('http')];
 
     const logger = requestlogger();
@@ -234,7 +234,7 @@ describe('Requestlog:', () => {
     const logspy = sandbox.spy(logger, 'log');
     try {
       await axios.get('http://localhost:1234/error');
-    } catch (e) {
+    } catch {
       sinon.assert.calledWith(logspy, {
         request: {
           host: sinon.match(/localhost:[0-9]+/gm),
@@ -255,7 +255,7 @@ describe('Requestlog:', () => {
     const logspy = sandbox.spy(logger, 'log');
     try {
       await axios.get('https://www.google.com/notfound');
-    } catch (e) {
+    } catch {
       sinon.assert.calledWith(logspy, {
         type: ['application'],
         request: {
@@ -273,7 +273,7 @@ describe('Requestlog:', () => {
     const logspy = sandbox.spy(logger, 'log');
     try {
       await axios.get('https://superfakedomain.fakextention/externalcall');
-    } catch (e) {
+    } catch {
       sinon.assert.calledWith(logspy, {
         type: ['application'],
         request: {
@@ -460,7 +460,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall dgp-correlation { alloptions }', async () => {
+  it('POST /externalcall dgp-correlation { alloptions, specific headers }', async () => {
     const logger = requestlogger({
       logResponsePayload: true,
       logRequestHeaders: ['dgp-correlation'],

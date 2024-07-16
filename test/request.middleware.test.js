@@ -175,7 +175,7 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /internalcall { alloptions } 200', async () => {
+  it('GET /internalcall { alloptions } 200 timing', async () => {
     clock = sinon.useFakeTimers(Date.now());
     server = await app.start({
       type: 'json',
@@ -484,7 +484,7 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
-  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
+  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested.wrong) } 200', async () => {
     clock = sinon.useFakeTimers(Date.now());
     server = await app.start({
       type: 'text',
