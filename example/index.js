@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const express = require('express');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const axios = require('axios');
 
 const { requestMiddleware, requestlogger } = require('../lib');
