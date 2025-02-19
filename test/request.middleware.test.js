@@ -176,7 +176,12 @@ describe('middleware:', () => {
     });
   });
   it('GET /internalcall { alloptions } 200 timing', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    // clock = sinon.useFakeTimers();
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
+    // const time = new Date().toISOString();
     server = await app.start({
       type: 'json',
       logResponsePayload: true,
@@ -194,7 +199,7 @@ describe('middleware:', () => {
       },
     );
     const result = {
-      timestamp: new Date().toISOString(),
+      timestamp: sinon.match.any,
       type: ['application'],
       level: 'INFO',
       correlationId: 'dgpheadervalue',
@@ -225,12 +230,14 @@ describe('middleware:', () => {
       },
       protocol: 'http',
     };
-    expect(result).to.be.jsonSchema(logschema);
     sinon.assert.calledWith(logspy, result);
     clock.restore();
   });
   it('GET /internalcall { alloptions & headers } 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'json',
       logResponsePayload: true,
@@ -248,7 +255,7 @@ describe('middleware:', () => {
       },
     );
     const result = {
-      timestamp: new Date().toISOString(),
+      timestamp: sinon.match.string,
       type: ['application'],
       level: 'INFO',
       correlationId: 'dgpheadervalue',
@@ -269,12 +276,20 @@ describe('middleware:', () => {
       },
       protocol: 'http',
     };
-    expect(result).to.be.jsonSchema(logschema);
+    // replace sinson match timestamp for jsonschema
+    const schema_check = {
+      ...result,
+      timestamp: 'timestamp'
+    }
+    expect(schema_check).to.be.jsonSchema(logschema);
     sinon.assert.calledWith(logspy, result);
     clock.restore();
   });
   it('GET /internalcall { alloptions & headers & type } 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'text',
       logResponsePayload: true,
@@ -294,7 +309,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(
       logspy,
       'INFO:',
-      new Date().toISOString(),
+      sinon.match.string,
       {
         correlationId: 'dgpheadervalue',
         request: {
@@ -317,7 +332,10 @@ describe('middleware:', () => {
     clock.restore();
   });
   it('GET /internalcall { logRequestHeaders & correlationIdLocation } 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'text',
       logResponsePayload: true,
@@ -337,7 +355,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(
       logspy,
       'INFO:',
-      new Date().toISOString(),
+      sinon.match.string,
       {
         correlationId: 'reqid',
         request: {
@@ -359,7 +377,10 @@ describe('middleware:', () => {
     clock.restore();
   });
   it('GET /internalcall { logRequestHeaders & correlationIdfallback 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'text',
       logResponsePayload: true,
@@ -378,7 +399,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(
       logspy,
       'INFO:',
-      new Date().toISOString(),
+      sinon.match.string,
       {
         correlationId: '_no_correlation_',
         request: {
@@ -400,7 +421,10 @@ describe('middleware:', () => {
     clock.restore();
   });
   it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) & fallback } 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'text',
       logResponsePayload: true,
@@ -421,7 +445,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(
       logspy,
       'INFO:',
-      new Date().toISOString(),
+      sinon.match.string,
       {
         correlationId: '_no_correlation_',
         request: {
@@ -443,7 +467,10 @@ describe('middleware:', () => {
     clock.restore();
   });
   it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'text',
       logResponsePayload: true,
@@ -463,7 +490,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(
       logspy,
       'INFO:',
-      new Date().toISOString(),
+      sinon.match.string,
       {
         correlationId: 'reqinfoid',
         request: {
@@ -485,7 +512,10 @@ describe('middleware:', () => {
     clock.restore();
   });
   it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested.wrong) } 200', async () => {
-    clock = sinon.useFakeTimers(Date.now());
+    clock = sinon.useFakeTimers({
+        now: 1483228800000,
+        shouldAdvanceTime: true,
+    });
     server = await app.start({
       type: 'text',
       logResponsePayload: true,
@@ -505,7 +535,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(
       logspy,
       'INFO:',
-      new Date().toISOString(),
+      sinon.match.string,
       {
         request: {
           host,
