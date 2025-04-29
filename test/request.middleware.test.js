@@ -29,7 +29,6 @@ describe('middleware:', () => {
     server = await app.start({
       type: 'json',
     });
-    // const logger = requestlogger();
     await axios.get(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
