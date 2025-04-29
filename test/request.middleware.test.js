@@ -159,7 +159,7 @@ describe('middleware:', () => {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/internalcall',
         method: 'GET',
-        payload: {},
+        payload: undefined,
       },
       response: {
         headers: {
@@ -215,7 +215,7 @@ describe('middleware:', () => {
         host,
         path: '/internalcall',
         method: 'GET',
-        payload: {},
+        payload: undefined,
       },
       response: {
         headers: {
@@ -266,7 +266,7 @@ describe('middleware:', () => {
         host,
         path: '/internalcall',
         method: 'GET',
-        payload: {},
+        payload: undefined,
       },
       response: {
         headers: { 'x-powered-by': 'Express' },
@@ -317,7 +317,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -362,7 +362,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -406,7 +406,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -452,7 +452,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -497,7 +497,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -541,7 +541,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },

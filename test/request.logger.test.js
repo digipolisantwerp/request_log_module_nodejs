@@ -191,6 +191,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
+
   it('url of type string error', async () => {
     delete require.cache[require.resolve('http')];
 
@@ -212,13 +213,13 @@ describe('Requestlog:', () => {
       });
     }
     try {
-      await get(`http://localhosttt:${server.address().port}/externalcall`, {}, () => {});
+      await get(`http://localhost:${server.address().port}/externalcall`, {}, () => {});
     } catch (e) {
       console.log('e', e);
     }
     sinon.assert.calledWith(logspy, {
       request: {
-        host: sinon.match(/localhosttt:[0-9]+/gm),
+        host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
       },
       response: {
