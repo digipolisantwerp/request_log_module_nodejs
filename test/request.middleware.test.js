@@ -29,7 +29,6 @@ describe('middleware:', () => {
     server = await app.start({
       type: 'json',
     });
-    // const logger = requestlogger();
     await axios.get(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
@@ -159,7 +158,7 @@ describe('middleware:', () => {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/internalcall',
         method: 'GET',
-        payload: {},
+        payload: undefined,
       },
       response: {
         headers: {
@@ -215,7 +214,7 @@ describe('middleware:', () => {
         host,
         path: '/internalcall',
         method: 'GET',
-        payload: {},
+        payload: undefined,
       },
       response: {
         headers: {
@@ -266,7 +265,7 @@ describe('middleware:', () => {
         host,
         path: '/internalcall',
         method: 'GET',
-        payload: {},
+        payload: undefined,
       },
       response: {
         headers: { 'x-powered-by': 'Express' },
@@ -317,7 +316,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -362,7 +361,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -406,7 +405,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -452,7 +451,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -497,7 +496,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
@@ -541,7 +540,7 @@ describe('middleware:', () => {
           host,
           path: '/internalcall',
           method: 'GET',
-          payload: {},
+          payload: undefined,
         },
         response: {
           headers: { 'x-powered-by': 'Express' },
