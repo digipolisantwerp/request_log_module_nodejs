@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]: https://github.com/digipolisantwerp/request_log_module_nodejs/compare/v0.0.1...HEAD
 ## [Unreleased] - yyyy-mm-dd
 
+[0.7.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.7.0
+## [0.7.0] - 2025-05-07
+
+- Add support for fetch requests
+- node 24 tests
+- remove node 14.x, 16.x compatibility is kept but not new fetch features
+
 [0.6.4]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.6.0
 ## [0.6.0] - 2023-12-01
 
