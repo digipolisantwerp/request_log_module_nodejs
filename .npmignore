@@ -6,6 +6,7 @@
 .eslintrc.json
 .nyc_output
 .travis.yml
+eslint.config.mjs
 CHANGELOG.md
 LICENSE
 README.md

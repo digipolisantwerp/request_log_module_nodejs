@@ -1,17 +1,13 @@
+const assert = require('node:assert/strict');
 const https = require('https');
 const http = require('http');
 const { URL } = require('url');
 const sinon = require('sinon');
 const axios = require('axios');
-const chai = require('chai');
-
-const { expect } = chai;
 
 const { requestlogger } = require('../lib');
 const app = require('./helpers/server');
 const fetchTest = parseInt( process.version.split('.')[0].split('v')[1], 10) >= 20;
-
-chai.use(require('chai-json-schema'));
 
 describe('Requestlog:', () => {
   let server;
@@ -86,7 +82,7 @@ describe('Requestlog:', () => {
         }
       );
       const body = await request.json();
-      expect(body).to.eql({ ok: 'ok' })
+      assert.deepStrictEqual(body, { ok: 'ok' })
       return new Promise((resolve) => {
         setTimeout(() => {
           sinon.assert.calledWith(logspy, {
@@ -117,7 +113,7 @@ describe('Requestlog:', () => {
         }
       );
       const body = await request.text();
-      expect(body).to.eql('{"ok":"ok"}')
+      assert.deepStrictEqual(body, '{"ok":"ok"}')
       return new Promise((resolve) => {
         setTimeout(() => {
           sinon.assert.calledWith(logspy, {
@@ -144,7 +140,7 @@ describe('Requestlog:', () => {
     };
     const req = https.request(options);
     req.end();
-    chai.expect(req.constructor.name).to.eql('ClientRequest');
+    assert.deepStrictEqual(req.constructor.name, 'ClientRequest')
   });
   it('url of type URL', async () => {
     const options = {
@@ -154,7 +150,7 @@ describe('Requestlog:', () => {
     };
     const req = https.request(new URL('https://google.be'), options);
     req.end();
-    chai.expect(req.constructor.name).to.eql('ClientRequest');
+    assert.deepStrictEqual(req.constructor.name, 'ClientRequest')
   });
   it('url of type URL localhost', async () => {
     delete require.cache[require.resolve('http')];

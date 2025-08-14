@@ -30,6 +30,7 @@ function initializeExpress(config) {
   });
   app.enable('trust proxy');
 }
+
 function startListening() {
   return new Promise((resolve) => {
     server = app.listen(undefined, () => {

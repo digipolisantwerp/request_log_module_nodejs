@@ -1,13 +1,11 @@
+const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const axios = require('axios');
-const chai = require('chai');
-chai.use(require('chai-json-schema'));
+const { Validator } = require('jsonschema');
 const logschema = require('./data/logschema.json');
-const app = require('./helpers/server');
+const app = require('./helpers/server.js');
 
-const { expect } = chai;
-
-chai.use(require('chai-json-schema'));
+const validator = new Validator();
 
 describe('middleware:', () => {
   let server;
@@ -275,12 +273,12 @@ describe('middleware:', () => {
       },
       protocol: 'http',
     };
-    // replace sinson match timestamp for jsonschema
+    // replace sinon match timestamp for jsonschema
     const schema_check = {
       ...result,
-      timestamp: 'timestamp'
+      timestamp: new Date().toISOString(),
     }
-    expect(schema_check).to.be.jsonSchema(logschema);
+    assert.equal(validator.validate(schema_check, logschema).valid ,true)
     sinon.assert.calledWith(logspy, result);
     clock.restore();
   });
