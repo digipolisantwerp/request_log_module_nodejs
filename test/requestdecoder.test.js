@@ -1,9 +1,8 @@
-const chai = require('chai');
-
-const { getHost } = require('../lib/helpers/requestdecoder');
+const assert = require('node:assert/strict');
+const { getHost } = require('../lib/helpers/requestdecoder.js');
 
 describe('requestdecoder:', () => {
   it('getHost', async () => {
-    chai.expect(getHost({ host: 'host' })).to.eql('host');
+    assert.equal(getHost({ host: 'host' }), 'host');
   });
 });
