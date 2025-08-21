@@ -8,15 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] - yyyy-mm-dd
 
 [0.9.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.9.0
-
 ## [0.9.0] - 2025-05-07
 
  - re-release 0.7.1
 
-[0.9.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.7.1
+[0.7.1]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.7.1
+## [0.7.0] - 2025-05-08
 
  - compatibility older node
 
+[0.7.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v0.7.0
 ## [0.7.0] - 2025-05-07
 
 - Add support for fetch requests
