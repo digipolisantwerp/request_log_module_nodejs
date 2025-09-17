@@ -24,6 +24,124 @@ describe('Requestlog:', () => {
     app.stop();
     done();
   });
+  it('http POST with body /externalcall {} 200', () => {
+      const logger = requestlogger({ logResponsePayload: true, logRequestPayload: true });
+      const logspy = sandbox.spy(logger, 'log');
+      const postData = JSON.stringify({
+          'msg': 'Hello World!',
+      });
+
+      const options = {
+          hostname: `localhost`,
+          port: server.address().port,
+          path: '/externalcall',
+          protocol: 'http:',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData),
+          },
+      };
+
+      return new Promise((resolve, reject) => {
+          const req = http.request(options, (res) => {
+              res.on('data', () => {
+              });
+              res.on('end', () => {
+                  console.log('Response ended: ');
+                  sinon.assert.calledWith(logspy, {
+                      request: {
+                          host: sinon.match(/localhost:[0-9]+/gm),
+                          path: '/externalcall',
+                          method: 'POST',
+                          payload: '{"msg":"Hello World!"}'
+                      },
+                      response: {
+                          status: 200,
+                          duration: sinon.match.number,
+                          payload: '{"ok":"ok"}'
+                      },
+                      protocol: 'http:',
+                      type: ['application'],
+                  });
+                  resolve('ok');
+              });
+          }).on('error', (err) => {
+              console.log('Error: ', err.message);
+              reject(err);
+          });
+          req.write(postData);
+          req.end();
+      });
+  });
+  it('http fails', () => {
+      const logger = requestlogger({ logResponsePayload: true, log: true });
+      const logspy = sandbox.spy(logger, 'log');
+      return new Promise((resolve, reject) => {
+        http.get(`http://localhost/externalcall`, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            reject('should not end');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+              sinon.assert.calledWith(logspy, {
+                  request: {
+                      host: 'localhost',
+                      path: '/externalcall',
+                  },
+                  response: {
+                      status: sinon.match.any,
+                      duration: sinon.match.any,
+                  },
+                  protocol: 'http:',
+                  type: ['application'],
+              });
+          resolve();
+        });
+      });
+  });
+  it('http fails with correlationid header', () => {
+      const logger = requestlogger({ logResponsePayload: true, log: true });
+      const logspy = sandbox.spy(logger, 'log');
+      const options = {
+          hostname: `localhost`,
+          path: '/externalcall',
+          protocol: 'http:',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'dgp-correlation': 'correlationid',
+          },
+      };
+      return new Promise((resolve, reject) => {
+        http.request(options, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            reject('should not end');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+              sinon.assert.calledWith(logspy, {
+                  correlationId: 'correlationid',
+                  request: {
+                      host: 'localhost',
+                      path: '/externalcall',
+                      method: 'POST',
+                  },
+                  response: {
+                      status: sinon.match.any,
+                      duration: sinon.match.any,
+                  },
+                  protocol: 'http:',
+                  type: ['application'],
+              });
+          resolve();
+        });
+      });
+  });
   it('GET /externalcall {} 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
