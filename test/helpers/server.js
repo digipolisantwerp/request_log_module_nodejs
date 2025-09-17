@@ -14,6 +14,7 @@ function initializeExpress(config) {
   });
   app.get('/externalcall', (req, res) => res.json({ ok: 'ok' }));
   app.post('/externalcall', (req, res) => res.json({ ok: 'ok' }));
+  app.get('/externalcalltext', (req, res) => res.send('ok'));
   app.use(requestMiddleware(config));
 
   app.get('/internalcall', (req, res) => res.json({ ok: 'ok' }));
