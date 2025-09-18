@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]: https://github.com/digipolisantwerp/request_log_module_nodejs/compare/v0.0.1...HEAD
 ## [Unreleased] - yyyy-mm-dd
 
+[1.1.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v1.1.0
+## [1.1.0] - 2025-09-18
+
+ - feat: Implement logresponse & request for native fetch
+ - chore: remove axios
+
 [1.0.0]: https://github.com/digipolisantwerp/request_log_module_nodejs/tree/v1.0.0
 ## [1.0.0] - 2025-08-21
 
