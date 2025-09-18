@@ -3,7 +3,6 @@ const https = require('https');
 const http = require('http');
 const { URL } = require('url');
 const sinon = require('sinon');
-const axios = require('axios');
 
 const { requestlogger } = require('../lib');
 const app = require('./helpers/server');
@@ -25,10 +24,128 @@ describe('Requestlog:', () => {
     app.stop();
     done();
   });
+  it('http POST with body /externalcall {} 200', () => {
+      const logger = requestlogger({ logResponsePayload: true, logRequestPayload: true });
+      const logspy = sandbox.spy(logger, 'log');
+      const postData = JSON.stringify({
+          'msg': 'Hello World!',
+      });
+
+      const options = {
+          hostname: `localhost`,
+          port: server.address().port,
+          path: '/externalcall',
+          protocol: 'http:',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData),
+          },
+      };
+
+      return new Promise((resolve, reject) => {
+          const req = http.request(options, (res) => {
+              res.on('data', () => {
+              });
+              res.on('end', () => {
+                  console.log('Response ended: ');
+                  sinon.assert.calledWith(logspy, {
+                      request: {
+                          host: sinon.match(/localhost:[0-9]+/gm),
+                          path: '/externalcall',
+                          method: 'POST',
+                          payload: '{"msg":"Hello World!"}'
+                      },
+                      response: {
+                          status: 200,
+                          duration: sinon.match.number,
+                          payload: '{"ok":"ok"}'
+                      },
+                      protocol: 'http:',
+                      type: ['application'],
+                  });
+                  resolve('ok');
+              });
+          }).on('error', (err) => {
+              console.log('Error: ', err.message);
+              reject(err);
+          });
+          req.write(postData);
+          req.end();
+      });
+  });
+  it('http fails', () => {
+      const logger = requestlogger({ logResponsePayload: true, log: true });
+      const logspy = sandbox.spy(logger, 'log');
+      return new Promise((resolve, reject) => {
+        http.get(`http://localhost/externalcall`, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            reject('should not end');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+              sinon.assert.calledWith(logspy, {
+                  request: {
+                      host: 'localhost',
+                      path: '/externalcall',
+                  },
+                  response: {
+                      status: sinon.match.any,
+                      duration: sinon.match.any,
+                  },
+                  protocol: 'http:',
+                  type: ['application'],
+              });
+          resolve();
+        });
+      });
+  });
+  it('http fails with correlationid header', () => {
+      const logger = requestlogger({ logResponsePayload: true, log: true });
+      const logspy = sandbox.spy(logger, 'log');
+      const options = {
+          hostname: `localhost`,
+          path: '/externalcall',
+          protocol: 'http:',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'dgp-correlation': 'correlationid',
+          },
+      };
+      return new Promise((resolve, reject) => {
+        http.request(options, (res) => {
+          res.on('data', () => {
+          });
+          res.on('end', () => {
+            reject('should not end');
+          });
+        }).on('error', (err) => {
+          console.log('Error: ', err.message);
+              sinon.assert.calledWith(logspy, {
+                  correlationId: 'correlationid',
+                  request: {
+                      host: 'localhost',
+                      path: '/externalcall',
+                      method: 'POST',
+                  },
+                  response: {
+                      status: sinon.match.any,
+                      duration: sinon.match.any,
+                  },
+                  protocol: 'http:',
+                  type: ['application'],
+              });
+          resolve();
+        });
+      });
+  });
   it('GET /externalcall {} 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
-    await axios.get(`http://localhost:${server.address().port}/externalcall`);
+    await global.fetch(`http://localhost:${server.address().port}/externalcall`);
     sinon.assert.calledWith(logspy, {
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
@@ -248,7 +365,7 @@ describe('Requestlog:', () => {
   it('GET /externalcall?page=1 {} should not log query 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
-    await axios.get(`http://localhost:${server.address().port}/externalcall?page=1`);
+    await global.fetch(`http://localhost:${server.address().port}/externalcall?page=1`);
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       request: {
@@ -266,7 +383,7 @@ describe('Requestlog:', () => {
   it('GET /externalcall { logRequestSearchParams: true } should log query 200', async () => {
     const logger = requestlogger({ logRequestSearchParams: true });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.get(`http://localhost:${server.address().port}/externalcall?page=1`);
+    await global.fetch(`http://localhost:${server.address().port}/externalcall?page=1`);
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       request: {
@@ -324,7 +441,7 @@ describe('Requestlog:', () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
-      await axios.get('http://localhost:1234/error');
+      await global.fetch('http://localhost:1234/error');
     } catch {
       sinon.assert.calledWith(logspy, {
         request: {
@@ -345,7 +462,7 @@ describe('Requestlog:', () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
-      await axios.get('https://www.google.com/notfound');
+      await global.fetch('https://www.google.com/notfound');
     } catch {
       sinon.assert.calledWith(logspy, {
         type: ['application'],
@@ -363,7 +480,7 @@ describe('Requestlog:', () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
-      await axios.get('https://superfakedomain.fakextention/externalcall');
+      await global.fetch('https://superfakedomain.fakextention/externalcall');
     } catch {
       sinon.assert.calledWith(logspy, {
         type: ['application'],
@@ -372,15 +489,15 @@ describe('Requestlog:', () => {
           path: '/externalcall',
           method: 'GET',
         },
-        response: { status: 'getaddrinfo ENOTFOUND superfakedomain.fakextention', duration: sinon.match.number },
+        response: { status: 'fetch failed: ENOTFOUND', duration: sinon.match.number },
         protocol: 'https:',
       });
     }
   });
-  it('GET /externalcall { logResponsePayload: true } 200', async () => {
+  it('GET /externalcall { logResponsePayload: true } 200', async() => {
     const logger = requestlogger({ logResponsePayload: true });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.get(`http://localhost:${server.address().port}/externalcall`);
+    await global.fetch(`http://localhost:${server.address().port}/externalcall`);
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       request: {
@@ -389,9 +506,9 @@ describe('Requestlog:', () => {
         method: 'GET',
       },
       response: {
-        payload: '{"ok":"ok"}',
         status: 200,
         duration: sinon.match.any,
+        payload: {"ok":"ok"},
       },
       protocol: 'http:',
     });
@@ -410,9 +527,9 @@ describe('Requestlog:', () => {
           method: 'GET',
         },
         response: {
-          payload: {"ok":"ok"},
           status: 200,
           duration: sinon.match.any,
+          payload: {"ok":"ok"},
         },
         protocol: 'http:',
       });
@@ -422,17 +539,16 @@ describe('Requestlog:', () => {
     const logger = requestlogger({ logResponsePayload: true });
     const logspy = sandbox.spy(logger, 'log');
     if(fetchTest) {
-      const response = await global.fetch(`http://localhost:${server.address().port}/externalcall`);
-      await response.text();
+      await global.fetch(`http://localhost:${server.address().port}/externalcalltext`);
       return sinon.assert.calledWith(logspy, {
         type: ['application'],
         request: {
           host: sinon.match(/localhost:[0-9]+/gm),
-          path: '/externalcall',
+          path: '/externalcalltext',
           method: 'GET',
         },
         response: {
-          payload: '{"ok":"ok"}',
+          payload: 'ok',
           status: 200,
           duration: sinon.match.any,
         },
@@ -443,7 +559,8 @@ describe('Requestlog:', () => {
   it('POST /externalcall {} 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(`http://localhost:${server.address().port}/externalcall?${query}`, { method: 'POST' });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       request: {
@@ -458,13 +575,14 @@ describe('Requestlog:', () => {
   it('POST /externalcall default { logRequestPayload: true }', async () => {
     const logger = requestlogger({ logRequestPayload: true });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(`http://localhost:${server.address().port}/externalcall?${query}`, { method: 'POST' });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       request: {
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
-        payload: '{"param":"paramval"}',
+        payload: {"param":"paramval"},
         method: 'POST',
       },
       response: { status: 200, duration: sinon.match.number },
@@ -474,21 +592,20 @@ describe('Requestlog:', () => {
   it('POST /externalcall default { logRequestHeaders: true }', async () => {
     const logger = requestlogger({ logRequestHeaders: true });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' }, {
-      headers: {
-        myheader: 'header',
-      },
-    });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(
+      `http://localhost:${server.address().port}/externalcall?${query}`,
+      {
+        method: 'POST',
+        headers: {
+          myheader: 'header',
+        },
+      });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       request: {
         headers: {
-          Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json',
           myheader: 'header',
-          'Accept-Encoding': sinon.match.any,
-          'User-Agent': sinon.match(/axios\/*/gm),
-          'Content-Length': sinon.match.any,
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
@@ -501,11 +618,15 @@ describe('Requestlog:', () => {
   it('POST /externalcall dgp-correlation {}', async () => {
     const logger = requestlogger({});
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' }, {
-      headers: {
-        'dgp-correlation': 'correlationid',
-      },
-    });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(
+      `http://localhost:${server.address().port}/externalcall?${query}`,
+      {
+        method: 'POST',
+        headers: {
+          'dgp-correlation': 'correlationid',
+        },
+      });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       correlationId: 'correlationid',
@@ -527,29 +648,30 @@ describe('Requestlog:', () => {
       correlationIdfallback: '_no_correlation_',
     });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' }, {
-      headers: {
-      },
-    });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(
+      `http://localhost:${server.address().port}/externalcall?${query}`,
+      {
+        method: 'POST',
+        headers: {
+          myheader: 'header',
+        },
+      });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       correlationId: '_no_correlation_',
       request: {
         headers: {
-          Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json',
-          'Accept-Encoding': sinon.match.any,
-          'User-Agent': sinon.match(/axios\/*/gm),
-          'Content-Length': sinon.match.any,
+          myheader: 'header',
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
-        payload: '{"param":"paramval"}',
+        payload: {"param":"paramval"},
         method: 'POST',
       },
       response: {
         headers: sinon.match.any,
-        payload: '{"ok":"ok"}',
+        payload: {"ok":"ok"},
         status: 200,
         duration: sinon.match.number,
       },
@@ -564,31 +686,30 @@ describe('Requestlog:', () => {
       logResponseHeaders: true,
     });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' }, {
-      headers: {
-        'dgp-correlation': 'correlationid',
-      },
-    });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(
+      `http://localhost:${server.address().port}/externalcall?${query}`,
+      {
+        method: 'POST',
+        headers: {
+          'dgp-correlation': 'correlationid',
+        },
+      });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       correlationId: 'correlationid',
       request: {
         headers: {
-          Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json',
           'dgp-correlation': 'correlationid',
-          'Accept-Encoding': sinon.match.any,
-          'User-Agent': sinon.match(/axios\/*/gm),
-          'Content-Length': sinon.match.any,
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
-        payload: '{"param":"paramval"}',
+        payload: {"param":"paramval"},
         method: 'POST',
       },
       response: {
         headers: sinon.match.any,
-        payload: '{"ok":"ok"}',
+        payload: {"ok":"ok"},
         status: 200,
         duration: sinon.match.number,
       },
@@ -603,11 +724,15 @@ describe('Requestlog:', () => {
       logResponseHeaders: ['x-powered-by'],
     });
     const logspy = sandbox.spy(logger, 'log');
-    await axios.post(`http://localhost:${server.address().port}/externalcall`, { param: 'paramval' }, {
-      headers: {
-        'dgp-correlation': 'correlationid',
-      },
-    });
+    const query = new URLSearchParams({ param: 'paramval' });
+    await global.fetch(
+      `http://localhost:${server.address().port}/externalcall?${query}`,
+      {
+        method: 'POST',
+        headers: {
+          'dgp-correlation': 'correlationid',
+        },
+      });
     sinon.assert.calledWith(logspy, {
       type: ['application'],
       correlationId: 'correlationid',
@@ -617,14 +742,14 @@ describe('Requestlog:', () => {
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/externalcall',
-        payload: '{"param":"paramval"}',
+        payload: {"param":"paramval"},
         method: 'POST',
       },
       response: {
         headers: {
           'x-powered-by': 'Express',
         },
-        payload: '{"ok":"ok"}',
+        payload: {"ok":"ok"},
         status: 200,
         duration: sinon.match.number,
       },

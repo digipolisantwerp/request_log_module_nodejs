@@ -1,6 +1,5 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
-const axios = require('axios');
 const { Validator } = require('jsonschema');
 const logschema = require('./data/logschema.json');
 const app = require('./helpers/server.js');
@@ -27,7 +26,7 @@ describe('middleware:', () => {
     server = await app.start({
       type: 'json',
     });
-    await axios.get(`http://localhost:${server.address().port}/internalcall`);
+    await global.fetch(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
       correlationId: sinon.match.any,
@@ -46,12 +45,12 @@ describe('middleware:', () => {
     server = await app.start({
       type: 'silent',
     });
-    await axios.get(`http://localhost:${server.address().port}/internalcall`);
+    await global.fetch(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledOnceWithExactly(logspy, sinon.match(/Express server listening on port/));
   });
   it('GET /internalcall { logResponsePayload: true } 200', async () => {
     server = await app.start({ type: 'json', logResponsePayload: true });
-    await axios.get(`http://localhost:${server.address().port}/internalcall`);
+    await global.fetch(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
       type: ['application'],
@@ -72,7 +71,7 @@ describe('middleware:', () => {
   });
   it('GET /internalcall?query=true { logRequestSearchParams: true } 200', async () => {
     server = await app.start({ type: 'json', logRequestSearchParams: true });
-    await axios.get(`http://localhost:${server.address().port}/internalcall?query=true`);
+    await global.fetch(`http://localhost:${server.address().port}/internalcall?query=true`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
       type: ['application'],
@@ -92,7 +91,7 @@ describe('middleware:', () => {
   });
   it('GET /internalcall?query=true { logRequestSearchParams: false } (default) 200', async () => {
     server = await app.start({ type: 'json', logRequestSearchParams: false });
-    await axios.get(`http://localhost:${server.address().port}/internalcall?query=true`);
+    await global.fetch(`http://localhost:${server.address().port}/internalcall?query=true`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
       type: ['application'],
@@ -112,7 +111,7 @@ describe('middleware:', () => {
   });
   it('GET /write { logResponsePayload: true } 200', async () => {
     server = await app.start({ type: 'json', logResponsePayload: true });
-    await axios.get(`http://localhost:${server.address().port}/write`);
+    await global.fetch(`http://localhost:${server.address().port}/write`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
       type: ['application'],
@@ -139,7 +138,7 @@ describe('middleware:', () => {
       logRequestPayload: true,
       logResponseHeaders: true,
     });
-    await axios.get(`http://localhost:${server.address().port}/internalcall`);
+    await global.fetch(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
       timestamp: sinon.match.any,
       type: ['application'],
@@ -147,11 +146,13 @@ describe('middleware:', () => {
       correlationId: sinon.match.any,
       request: {
         headers: {
-          accept: 'application/json, text/plain, */*',
-          'user-agent': sinon.match(/axios\/*/gm),
-          'accept-encoding': sinon.match.any,
           host: sinon.match(/localhost:[0-9]+/gm),
-          connection: sinon.match.any,
+          connection: 'keep-alive',
+          accept: '*/*',
+          'accept-language': '*',
+          'sec-fetch-mode': 'cors',
+          'user-agent': 'node',
+          'accept-encoding': 'gzip, deflate'
         },
         host: sinon.match(/localhost:[0-9]+/gm),
         path: '/internalcall',
@@ -187,7 +188,7 @@ describe('middleware:', () => {
       logResponseHeaders: true,
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -202,12 +203,14 @@ describe('middleware:', () => {
       correlationId: 'dgpheadervalue',
       request: {
         headers: {
-          accept: 'application/json, text/plain, */*',
+          host: sinon.match(/localhost:[0-9]+/gm),
+          connection: 'keep-alive',
+          accept: '*/*',
           'dgp-correlation': 'dgpheadervalue',
-          'user-agent': sinon.match(/axios\/*/gm),
-          'accept-encoding': sinon.match.any,
-          host,
-          connection: sinon.match.any,
+          'accept-language': '*',
+          'sec-fetch-mode': 'cors',
+          'user-agent': 'node',
+          'accept-encoding': 'gzip, deflate'
         },
         host,
         path: '/internalcall',
@@ -243,7 +246,7 @@ describe('middleware:', () => {
       logResponseHeaders: ['x-powered-by'],
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -295,7 +298,7 @@ describe('middleware:', () => {
       logResponseHeaders: ['x-powered-by'],
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -341,7 +344,7 @@ describe('middleware:', () => {
       correlationIdLocation: 'id',
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -386,7 +389,7 @@ describe('middleware:', () => {
       correlationIdfallback: '_no_correlation_',
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -431,7 +434,7 @@ describe('middleware:', () => {
       correlationIdfallback: '_no_correlation_',
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -476,7 +479,7 @@ describe('middleware:', () => {
       correlationIdLocation: 'info.id',
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {
@@ -521,7 +524,7 @@ describe('middleware:', () => {
       correlationIdLocation: 'this.path.is.wrong.id',
     });
     const host = `localhost:${server.address().port}`;
-    await axios.get(
+    await global.fetch(
       `http://${host}/internalcall`,
       {
         headers: {

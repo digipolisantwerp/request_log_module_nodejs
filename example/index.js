@@ -1,5 +1,4 @@
 const express = require('express');
-const axios = require('axios');
 
 const { requestMiddleware, requestlogger } = require('../lib');
 
@@ -45,7 +44,7 @@ async function start() {
   try {
     initializeExpress();
     const startedapp = await startListening();
-    await axios.get('http://localhost:2000?page=1').catch(() => {});
+    await global.fetch('http://localhost:2000?page=1').catch(() => {});
     return startedapp;
   } catch (err) {
     console.log(`Error occured ${err}`);
