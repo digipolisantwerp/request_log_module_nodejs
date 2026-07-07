@@ -4,11 +4,6 @@ import sinon from 'sinon';
 import { Validator } from 'jsonschema';
 import logschema from './data/logschema.json' with { type: 'json'  };
 import app from'./helpers/server.js';
-// const assert = require('node:assert/strict');
-// const sinon = require('sinon');
-// const { Validator } = require('jsonschema');
-// const logschema = require('./data/logschema.json');
-// const app = require('./helpers/server.js');
 
 const validator = new Validator();
 

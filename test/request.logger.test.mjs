@@ -5,15 +5,9 @@ import https from 'node:https'
 import http from 'node:http'
 import { URL } from 'url'
 import sinon from 'sinon'
-// const https = require('https');
-// const http = require('http');
-// const { URL } = require('url');
-// const sinon = require('sinon');
-
-// const { requestlogger } = require('../lib');
 import { requestlogger } from '../lib/index.js'
 import * as app from './helpers/server.js'
-// const app = require('./helpers/server');
+
 const fetchTest = parseInt( process.version.split('.')[0].split('v')[1], 10) >= 20;
 
 describe('Requestlog:', () => {
@@ -274,7 +268,6 @@ describe('Requestlog:', () => {
     assert.deepStrictEqual(req.constructor.name, 'ClientRequest')
   });
   test('url of type URL localhost', async () => {
-    // delete require.cache[require.resolve('http')];
 
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
@@ -305,7 +298,6 @@ describe('Requestlog:', () => {
     });
   });
   test('url of type string', async () => {
-    // delete require.cache[require.resolve('http')];
 
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
@@ -336,8 +328,6 @@ describe('Requestlog:', () => {
     });
   });
   test('url of type string with query should not log query by default', async () => {
-    // delete require.cache[require.resolve('http')];
-
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     async function get(url, options) {
@@ -404,8 +394,6 @@ describe('Requestlog:', () => {
   });
 
   test('url of type string error', async () => {
-    // delete require.cache[require.resolve('http')];
-
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     async function get(url, options) {
