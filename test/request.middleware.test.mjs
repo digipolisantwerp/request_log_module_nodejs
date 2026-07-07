@@ -1,8 +1,9 @@
-const assert = require('node:assert/strict');
-const sinon = require('sinon');
-const { Validator } = require('jsonschema');
-const logschema = require('./data/logschema.json');
-const app = require('./helpers/server.js');
+import { test, describe, beforeEach, afterEach } from 'node:test';
+import assert from 'node:assert/strict';
+import sinon from 'sinon';
+import { Validator } from 'jsonschema';
+import logschema from './data/logschema.json' with { type: 'json'  };
+import app from'./helpers/server.js';
 
 const validator = new Validator();
 
@@ -12,17 +13,15 @@ describe('middleware:', () => {
   let logspy;
   let clock;
 
-  beforeEach((done) => {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
     logspy = sandbox.spy(console, 'log');
-    done();
   });
-  afterEach((done) => {
+  afterEach(async() => {
     sandbox.restore();
     app.stop();
-    done();
   });
-  it('GET /internalcall {} 200', async () => {
+  test('GET /internalcall {} 200', async () => {
     server = await app.start({
       type: 'json',
     });
@@ -41,14 +40,14 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /internalcall {} 200 silent', async () => {
+  test('GET /internalcall {} 200 silent', async () => {
     server = await app.start({
       type: 'silent',
     });
     await global.fetch(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledOnceWithExactly(logspy, sinon.match(/Express server listening on port/));
   });
-  it('GET /internalcall { logResponsePayload: true } 200', async () => {
+  test('GET /internalcall { logResponsePayload: true } 200', async () => {
     server = await app.start({ type: 'json', logResponsePayload: true });
     await global.fetch(`http://localhost:${server.address().port}/internalcall`);
     sinon.assert.calledWith(logspy, {
@@ -69,7 +68,7 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /internalcall?query=true { logRequestSearchParams: true } 200', async () => {
+  test('GET /internalcall?query=true { logRequestSearchParams: true } 200', async () => {
     server = await app.start({ type: 'json', logRequestSearchParams: true });
     await global.fetch(`http://localhost:${server.address().port}/internalcall?query=true`);
     sinon.assert.calledWith(logspy, {
@@ -89,7 +88,7 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /internalcall?query=true { logRequestSearchParams: false } (default) 200', async () => {
+  test('GET /internalcall?query=true { logRequestSearchParams: false } (default) 200', async () => {
     server = await app.start({ type: 'json', logRequestSearchParams: false });
     await global.fetch(`http://localhost:${server.address().port}/internalcall?query=true`);
     sinon.assert.calledWith(logspy, {
@@ -109,7 +108,7 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /write { logResponsePayload: true } 200', async () => {
+  test('GET /write { logResponsePayload: true } 200', async () => {
     server = await app.start({ type: 'json', logResponsePayload: true });
     await global.fetch(`http://localhost:${server.address().port}/write`);
     sinon.assert.calledWith(logspy, {
@@ -130,7 +129,7 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /internalcall { alloptions } 200', async () => {
+  test('GET /internalcall { alloptions } 200', async () => {
     server = await app.start({
       type: 'json',
       logResponsePayload: true,
@@ -173,7 +172,7 @@ describe('middleware:', () => {
       protocol: 'http',
     });
   });
-  it('GET /internalcall { alloptions } 200 timing', async () => {
+  test('GET /internalcall { alloptions } 200 timing', async () => {
     // clock = sinon.useFakeTimers();
     clock = sinon.useFakeTimers({
         now: 1483228800000,
@@ -233,7 +232,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(logspy, result);
     clock.restore();
   });
-  it('GET /internalcall { alloptions & headers } 200', async () => {
+  test('GET /internalcall { alloptions & headers } 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,
@@ -285,7 +284,7 @@ describe('middleware:', () => {
     sinon.assert.calledWith(logspy, result);
     clock.restore();
   });
-  it('GET /internalcall { alloptions & headers & type } 200', async () => {
+  test('GET /internalcall { alloptions & headers & type } 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,
@@ -331,7 +330,7 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
-  it('GET /internalcall { logRequestHeaders & correlationIdLocation } 200', async () => {
+  test('GET /internalcall { logRequestHeaders & correlationIdLocation } 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,
@@ -376,7 +375,7 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
-  it('GET /internalcall { logRequestHeaders & correlationIdfallback 200', async () => {
+  test('GET /internalcall { logRequestHeaders & correlationIdfallback 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,
@@ -420,7 +419,7 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
-  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) & fallback } 200', async () => {
+  test('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) & fallback } 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,
@@ -466,7 +465,7 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
-  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
+  test('GET /internalcall { logRequestHeaders & correlationIdLocation(nested) } 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,
@@ -511,7 +510,7 @@ describe('middleware:', () => {
     );
     clock.restore();
   });
-  it('GET /internalcall { logRequestHeaders & correlationIdLocation(nested.wrong) } 200', async () => {
+  test('GET /internalcall { logRequestHeaders & correlationIdLocation(nested.wrong) } 200', async () => {
     clock = sinon.useFakeTimers({
         now: 1483228800000,
         shouldAdvanceTime: true,

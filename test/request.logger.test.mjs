@@ -1,30 +1,28 @@
-const assert = require('node:assert/strict');
-const https = require('https');
-const http = require('http');
-const { URL } = require('url');
-const sinon = require('sinon');
+// const assert = require('node:assert/strict');
+import { test, describe, beforeEach, afterEach } from 'node:test';
+import assert from 'node:assert/strict';
+import https from 'node:https'
+import http from 'node:http'
+import { URL } from 'url'
+import sinon from 'sinon'
+import { requestlogger } from '../lib/index.js'
+import * as app from './helpers/server.js'
 
-const { requestlogger } = require('../lib');
-const app = require('./helpers/server');
 const fetchTest = parseInt( process.version.split('.')[0].split('v')[1], 10) >= 20;
 
 describe('Requestlog:', () => {
   let server;
   let sandbox;
 
-  beforeEach((done) => {
+  beforeEach(async () => {
     sandbox = sinon.createSandbox();
-    app.start().then((application) => {
-      server = application;
-      done();
-    }).catch((e) => done(e));
+    server = await app.start();
   });
-  afterEach((done) => {
+  afterEach(async() => {
     sandbox.restore();
     app.stop();
-    done();
   });
-  it('http POST with body /externalcall {} 200', () => {
+  test('http POST with body /externalcall {} 200', () => {
       const logger = requestlogger({ logResponsePayload: true, logRequestPayload: true });
       const logspy = sandbox.spy(logger, 'log');
       const postData = JSON.stringify({
@@ -74,7 +72,7 @@ describe('Requestlog:', () => {
           req.end();
       });
   });
-  it('http fails', () => {
+  test('http fails', () => {
       const logger = requestlogger({ logResponsePayload: true, log: true });
       const logspy = sandbox.spy(logger, 'log');
       return new Promise((resolve, reject) => {
@@ -102,7 +100,7 @@ describe('Requestlog:', () => {
         });
       });
   });
-  it('http fails with correlationid header', () => {
+  test('http fails with correlationid header', () => {
       const logger = requestlogger({ logResponsePayload: true, log: true });
       const logspy = sandbox.spy(logger, 'log');
       const options = {
@@ -142,7 +140,7 @@ describe('Requestlog:', () => {
         });
       });
   });
-  it('GET /externalcall {} 200', async () => {
+  test('GET /externalcall {} 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     await global.fetch(`http://localhost:${server.address().port}/externalcall`);
@@ -157,7 +155,7 @@ describe('Requestlog:', () => {
       type: ['application'],
     });
   });
-  it('GET /externalcall {} fetch 200', async () => {
+  test('GET /externalcall {} fetch 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     if(fetchTest) {
@@ -186,7 +184,7 @@ describe('Requestlog:', () => {
       });
     }
   })
-  it('GET /externalcall {} fetch 200 json', async () => {
+  test('GET /externalcall {} fetch 200 json', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     if(fetchTest) {
@@ -217,7 +215,7 @@ describe('Requestlog:', () => {
       });
     }
   })
-  it('GET /externalcall {} fetch 200 text', async () => {
+  test('GET /externalcall {} fetch 200 text', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     if(fetchTest) {
@@ -248,7 +246,7 @@ describe('Requestlog:', () => {
       });
     }
   })
-  it('no callback return res', async () => {
+  test('no callback return res', async () => {
     const options = {
       hostname: 'google.com',
       port: 443,
@@ -259,7 +257,7 @@ describe('Requestlog:', () => {
     req.end();
     assert.deepStrictEqual(req.constructor.name, 'ClientRequest')
   });
-  it('url of type URL', async () => {
+  test('url of type URL', async () => {
     const options = {
       port: 443,
       path: '/',
@@ -269,8 +267,7 @@ describe('Requestlog:', () => {
     req.end();
     assert.deepStrictEqual(req.constructor.name, 'ClientRequest')
   });
-  it('url of type URL localhost', async () => {
-    delete require.cache[require.resolve('http')];
+  test('url of type URL localhost', async () => {
 
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
@@ -300,8 +297,7 @@ describe('Requestlog:', () => {
       type: ['application'],
     });
   });
-  it('url of type string', async () => {
-    delete require.cache[require.resolve('http')];
+  test('url of type string', async () => {
 
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
@@ -331,9 +327,7 @@ describe('Requestlog:', () => {
       type: ['application'],
     });
   });
-  it('url of type string with query should not log query by default', async () => {
-    delete require.cache[require.resolve('http')];
-
+  test('url of type string with query should not log query by default', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     async function get(url, options) {
@@ -362,7 +356,7 @@ describe('Requestlog:', () => {
       type: ['application'],
     });
   });
-  it('GET /externalcall?page=1 {} should not log query 200', async () => {
+  test('GET /externalcall?page=1 {} should not log query 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     await global.fetch(`http://localhost:${server.address().port}/externalcall?page=1`);
@@ -380,7 +374,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('GET /externalcall { logRequestSearchParams: true } should log query 200', async () => {
+  test('GET /externalcall { logRequestSearchParams: true } should log query 200', async () => {
     const logger = requestlogger({ logRequestSearchParams: true });
     const logspy = sandbox.spy(logger, 'log');
     await global.fetch(`http://localhost:${server.address().port}/externalcall?page=1`);
@@ -399,9 +393,7 @@ describe('Requestlog:', () => {
     });
   });
 
-  it('url of type string error', async () => {
-    delete require.cache[require.resolve('http')];
-
+  test('url of type string error', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     async function get(url, options) {
@@ -437,7 +429,7 @@ describe('Requestlog:', () => {
       type: ['application'],
     });
   });
-  it('GET /externalcall {} error', async () => {
+  test('GET /externalcall {} error', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
@@ -458,7 +450,7 @@ describe('Requestlog:', () => {
       });
     }
   });
-  it('GET https://www.google.com/notfound {}', async () => {
+  test('GET https://www.google.com/notfound {}', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
@@ -476,7 +468,7 @@ describe('Requestlog:', () => {
       });
     }
   });
-  it('GET https://superfakedomain.fakextention/externalcall ERROR', async () => {
+  test('GET https://superfakedomain.fakextention/externalcall ERROR', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     try {
@@ -494,7 +486,7 @@ describe('Requestlog:', () => {
       });
     }
   });
-  it('GET /externalcall { logResponsePayload: true } 200', async() => {
+  test('GET /externalcall { logResponsePayload: true } 200', async() => {
     const logger = requestlogger({ logResponsePayload: true });
     const logspy = sandbox.spy(logger, 'log');
     await global.fetch(`http://localhost:${server.address().port}/externalcall`);
@@ -513,7 +505,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('GET /externalcall fetch { logResponsePayload: true } 200', async () => {
+  test('GET /externalcall fetch { logResponsePayload: true } 200', async () => {
     const logger = requestlogger({ logResponsePayload: true });
     const logspy = sandbox.spy(logger, 'log');
     if(fetchTest) {
@@ -535,7 +527,7 @@ describe('Requestlog:', () => {
       });
     }
   });
-  it('GET /externalcall fetch text { logResponsePayload: true } 200', async () => {
+  test('GET /externalcall fetch text { logResponsePayload: true } 200', async () => {
     const logger = requestlogger({ logResponsePayload: true });
     const logspy = sandbox.spy(logger, 'log');
     if(fetchTest) {
@@ -556,7 +548,7 @@ describe('Requestlog:', () => {
       });
     }
   });
-  it('POST /externalcall {} 200', async () => {
+  test('POST /externalcall {} 200', async () => {
     const logger = requestlogger();
     const logspy = sandbox.spy(logger, 'log');
     const query = new URLSearchParams({ param: 'paramval' });
@@ -572,7 +564,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall default { logRequestPayload: true }', async () => {
+  test('POST /externalcall default { logRequestPayload: true }', async () => {
     const logger = requestlogger({ logRequestPayload: true });
     const logspy = sandbox.spy(logger, 'log');
     const query = new URLSearchParams({ param: 'paramval' });
@@ -589,7 +581,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall default { logRequestHeaders: true }', async () => {
+  test('POST /externalcall default { logRequestHeaders: true }', async () => {
     const logger = requestlogger({ logRequestHeaders: true });
     const logspy = sandbox.spy(logger, 'log');
     const query = new URLSearchParams({ param: 'paramval' });
@@ -615,7 +607,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall dgp-correlation {}', async () => {
+  test('POST /externalcall dgp-correlation {}', async () => {
     const logger = requestlogger({});
     const logspy = sandbox.spy(logger, 'log');
     const query = new URLSearchParams({ param: 'paramval' });
@@ -639,7 +631,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall dgp-correlation { _no_correlation_ fallback }', async () => {
+  test('POST /externalcall dgp-correlation { _no_correlation_ fallback }', async () => {
     const logger = requestlogger({
       logResponsePayload: true,
       logRequestHeaders: true,
@@ -678,7 +670,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall dgp-correlation { alloptions }', async () => {
+  test('POST /externalcall dgp-correlation { alloptions }', async () => {
     const logger = requestlogger({
       logResponsePayload: true,
       logRequestHeaders: true,
@@ -716,7 +708,7 @@ describe('Requestlog:', () => {
       protocol: 'http:',
     });
   });
-  it('POST /externalcall dgp-correlation { alloptions, specific headers }', async () => {
+  test('POST /externalcall dgp-correlation { alloptions, specific headers }', async () => {
     const logger = requestlogger({
       logResponsePayload: true,
       logRequestHeaders: ['dgp-correlation'],
