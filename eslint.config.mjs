@@ -1,10 +1,7 @@
 import globals from "globals";
-import mochaPlugin from 'eslint-plugin-mocha';
 import pluginJs from "@eslint/js";
 
-
 export default [
-    mochaPlugin.configs.recommended,
     {
         files: ["**/*.js"],
         languageOptions: {sourceType: "commonjs"}
